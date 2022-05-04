@@ -8,11 +8,11 @@ public class EnemyController : MonoBehaviour
     public Transform player;
     public PlayerStats playerController;
     public float health = 100;
-    
+
     public float movementSpeed = 2f;
     public float strength = 1;
 
-    
+
 
     public float attackSpeed = 1f;
     public float maxDamageCooldown;
@@ -43,7 +43,7 @@ public class EnemyController : MonoBehaviour
     }
     private void OnTriggerStay2D(Collider2D other)
     {
-       
+
         if (other.CompareTag("Player"))
         {
             if (damageCooldown <= 0)
@@ -59,6 +59,18 @@ public class EnemyController : MonoBehaviour
         health -= dmg;
         if (health <= 0)
         {
+
+            //30% change to dropp an item
+
+            int random = UnityEngine.Random.Range(0, 100);
+            if (random < 30)
+            {
+                var gameManager = GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>();
+                int randomItem = UnityEngine.Random.Range(0, 3);
+                GameObject prefab = GameObject.FindGameObjectWithTag(gameManager.GetItemName(UnityEngine.Random.Range(0, gameManager.GetItemCount())));
+
+                Instantiate(prefab, transform.position, Quaternion.identity);
+            }
             Destroy(gameObject);
         }
     }
