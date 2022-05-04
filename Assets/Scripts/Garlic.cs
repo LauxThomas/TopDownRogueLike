@@ -24,7 +24,6 @@ public class Garlic : MonoBehaviour
         {
             if (damageCooldown <= 0)
             {
-                Debug.Log("Garlic hit");
                 other.GetComponent<EnemyController>().TakeDamage(strength);
                 damageCooldown = maxDamageCooldown;
             }
