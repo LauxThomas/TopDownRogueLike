@@ -6,16 +6,41 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    public List<GameObject> items = new List<GameObject>();
-    public string pathToPrefabs = "Assets/Resources/";
+    public List<GameObject> weapons = new List<GameObject>();
+    public List<GameObject> enemies = new List<GameObject>();
+    private string pathToPrefabs = "Assets/Resources/";
     public Transform player = null;
+    public int numberOfEnemies = 10;
 
 
     void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player").transform;
-        
+        InitPrefabs();
+        SpawnEnemies(numberOfEnemies);
 
+
+        player.gameObject.GetComponent<PlayerAttack>().enabled = true;
+    }
+
+    private void SpawnEnemies(int numberOfEnemies)
+    {
+
+        //spawn enemies
+        for (int i = 0; i < numberOfEnemies; i++)
+        {
+            //select random enemy
+            int randomEnemy = UnityEngine.Random.Range(0, enemies.Count);
+            GameObject enemy = enemies[randomEnemy];
+
+            Vector3 spawnPosition = new Vector3(UnityEngine.Random.Range(-10, 10), UnityEngine.Random.Range(-10, 10), 0);
+            Quaternion spawnRotation = Quaternion.identity;
+            Instantiate(enemy, spawnPosition, spawnRotation);
+        }
+    }
+
+    private void InitPrefabs()
+    {
         var info = new DirectoryInfo(pathToPrefabs);
         var fileInfo = info.GetFiles();
 
@@ -24,52 +49,56 @@ public class GameManager : MonoBehaviour
             if (file.Extension == ".prefab")
             {
                 var itemName = file.Name.Replace(".prefab", "");
-                GameObject item = Resources.Load(itemName) as GameObject;
-                var go = Instantiate(item, player);
-                //go.transform.parent = player;
-                items.Add(go);
-                go.SetActive(false);
+                GameObject currentPrefab = Resources.Load(itemName) as GameObject;
+
+                switch (currentPrefab.tag)
+                {
+                    case "Weapon":
+                        {
+                            AddWeapon(currentPrefab);
+                            break;
+                        }
+                    case "Enemy":
+                        {
+                            AddEnemy(currentPrefab);
+                            break;
+                        }
+                }
             }
-
-            //Debug.Log(file.Name);
-            //var item = Resources.Load(pathToPrefabs + file.Name) as GameObject;
-            //items.Add(item);
         }
-
-
-        //TODO: Write paths from prefabs into textfile or loop through complete folder
-        //UnityEngine.Object pPrefab = Resources.Load("Assets/Prefab/Items/Garlic");
-        //var pref = (GameObject)GameObject.Instantiate(pPrefab, Vector3.zero, Quaternion.identity);
-        //items.Add(pref);
-        //pref.SetActive(false);
-        player.gameObject.GetComponent<PlayerAttack>().enabled = true;
     }
 
+    internal void DropItem(GameObject gameObject)
+    {
+        Debug.Log("Drop item");
+    }
+
+    private void AddEnemy(GameObject currentPrefab)
+    {
+        enemies.Add(currentPrefab);
+    }
+
+    private void AddWeapon(GameObject currentPrefab)
+    {
+        var currentWeapon = Instantiate(currentPrefab, player);
+        weapons.Add(currentWeapon);
+        currentWeapon.SetActive(false);
+    }
 
     public GameObject GetItem(int index)
     {
-        return items[index % items.Count];
+        return weapons[index % weapons.Count];
     }
     public string GetItemName(int index)
     {
-        return items[index % items.Count].name;
+        return weapons[index % weapons.Count].name;
     }
 
     internal int GetItemCount()
     {
-        return items.Count;
+        return weapons.Count;
     }
 
-    private UnityEngine.Object LoadPrefabFromFile(string filename)
-    {
-        Debug.Log("Trying to load LevelPrefab from file (" + filename + ")...");
-        var loadedObject = Resources.Load("Levels/" + filename);
-        if (loadedObject == null)
-        {
-            throw new FileNotFoundException("...no file found - please check the configuration");
-        }
-        return loadedObject;
-    }
 
 
 }
