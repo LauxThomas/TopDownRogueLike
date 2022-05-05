@@ -7,24 +7,28 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     public List<GameObject> items = new List<GameObject>();
-    public string pathToPrefabs = "Resources/Assets/Prefabs/";
+    public string pathToPrefabs = "Assets/Resources/";
+    public Transform player = null;
 
 
     void Start()
     {
+        player = GameObject.FindGameObjectWithTag("Player").transform;
+        
 
         var info = new DirectoryInfo(pathToPrefabs);
         var fileInfo = info.GetFiles();
-        
+
         foreach (var file in fileInfo)
         {
             if (file.Extension == ".prefab")
             {
-                GameObject item = Resources.Load(pathToPrefabs + "Garlic") as GameObject;
-                Instantiate(item);
-                item.transform.parent = transform;
-                items.Add(item);
-                item.SetActive(false);
+                var itemName = file.Name.Replace(".prefab", "");
+                GameObject item = Resources.Load(itemName) as GameObject;
+                var go = Instantiate(item, player);
+                //go.transform.parent = player;
+                items.Add(go);
+                go.SetActive(false);
             }
 
             //Debug.Log(file.Name);
@@ -32,12 +36,13 @@ public class GameManager : MonoBehaviour
             //items.Add(item);
         }
 
+
         //TODO: Write paths from prefabs into textfile or loop through complete folder
         //UnityEngine.Object pPrefab = Resources.Load("Assets/Prefab/Items/Garlic");
         //var pref = (GameObject)GameObject.Instantiate(pPrefab, Vector3.zero, Quaternion.identity);
         //items.Add(pref);
         //pref.SetActive(false);
-
+        player.gameObject.GetComponent<PlayerAttack>().enabled = true;
     }
 
 
@@ -49,7 +54,7 @@ public class GameManager : MonoBehaviour
     {
         return items[index % items.Count].name;
     }
-    
+
     internal int GetItemCount()
     {
         return items.Count;
@@ -66,5 +71,5 @@ public class GameManager : MonoBehaviour
         return loadedObject;
     }
 
-    
+
 }
