@@ -7,8 +7,9 @@ public class EnemyController : MonoBehaviour
 {
     public Transform player;
     public PlayerStats playerController;
-    public float health = 100;
+    private GameManager gameManager;
 
+    public float health = 100;
     public float movementSpeed = 2f;
     public float strength = 1;
 
@@ -25,6 +26,7 @@ public class EnemyController : MonoBehaviour
         playerController = player.GetComponent<PlayerStats>();
 
         maxDamageCooldown = 1 / attackSpeed;
+        gameManager = GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>();
     }
 
     private void Update()
@@ -65,11 +67,10 @@ public class EnemyController : MonoBehaviour
             int random = UnityEngine.Random.Range(0, 100);
             if (random < 30)
             {
-                var gameManager = GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>();
-                int randomItem = UnityEngine.Random.Range(0, 3);
-                GameObject prefab = GameObject.FindGameObjectWithTag(gameManager.GetItemName(UnityEngine.Random.Range(0, gameManager.GetItemCount())));
 
-                Instantiate(prefab, transform.position, Quaternion.identity);
+
+
+                gameManager.DropItem(gameObject);
             }
             Destroy(gameObject);
         }
