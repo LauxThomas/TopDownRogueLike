@@ -5,8 +5,8 @@ TagManager:
   serializedVersion: 2
   tags:
   - Enemy
-  - Garlic
   - GameManager
+  - Weapon
   layers:
   - Default
   - TransparentFX
