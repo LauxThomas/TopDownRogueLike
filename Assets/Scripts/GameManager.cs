@@ -1,3 +1,4 @@
+using Assets.Scripts;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -6,12 +7,12 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    public List<GameObject> weapons = new List<GameObject>();
-    public List<GameObject> enemies = new List<GameObject>();
-    public List<GameObject> drops = new List<GameObject>();
+    private List<GameObject> weapons = new List<GameObject>();
+    private List<GameObject> enemies = new List<GameObject>();
+    private List<GameObject> drops = new List<GameObject>();
     private string pathToPrefabs = "Assets/Resources/";
-    public Transform player = null;
-    public int numberOfEnemies = 10;
+    private Transform player = null;
+    private int numberOfEnemies = 50;
 
 
     void Start()
@@ -19,7 +20,7 @@ public class GameManager : MonoBehaviour
         player = GameObject.FindGameObjectWithTag("Player").transform;
         InitPrefabs();
         SpawnEnemies(numberOfEnemies);
-
+        //spawnAtEdge();
 
         player.gameObject.GetComponent<PlayerAttack>().enabled = true;
     }
@@ -31,9 +32,41 @@ public class GameManager : MonoBehaviour
 
     }
 
+    //private void spawnAtEdge()
+    //{
+    //    //get position at the edge of the camera
+
+    //    var direction = (Direction)UnityEngine.Random.Range(0, 3);
+    //    Vector3 spawnPosition = GetSpawnPositionFromDirection(direction);
+
+    //    int randomEnemy = UnityEngine.Random.Range(0, enemies.Count);
+    //    GameObject enemy = enemies[randomEnemy];
+    //    Instantiate(enemy, spawnPosition, Quaternion.identity);
+    //}
+
+    private Vector3 GetSpawnPositionFromDirection(Direction direction)
+    {
+        //generate random value between 0 and 1
+        float randomValue = UnityEngine.Random.value;
+
+
+        switch (direction)
+        {
+            case Direction.North:
+                return (Camera.main.ViewportToWorldPoint(new Vector3(randomValue, 1+0.1f, 0)));
+            case Direction.South:
+                return (Camera.main.ViewportToWorldPoint(new Vector3(randomValue, 0 - 0.1f, 0)));
+            case Direction.West:
+                return (Camera.main.ViewportToWorldPoint(new Vector3(0 - 0.1f, randomValue, 0)));
+            case Direction.East:
+                return (Camera.main.ViewportToWorldPoint(new Vector3(1 + 0.1f, randomValue, 0)));
+            default:
+                return (Camera.main.ViewportToWorldPoint(new Vector3(1, 1, 0)));
+        }
+    }
+
     private void SpawnEnemies(int numberOfEnemies)
     {
-
         //spawn enemies
         for (int i = 0; i < numberOfEnemies; i++)
         {
@@ -41,9 +74,10 @@ public class GameManager : MonoBehaviour
             int randomEnemy = UnityEngine.Random.Range(0, enemies.Count);
             GameObject enemy = enemies[randomEnemy];
 
-            Vector3 spawnPosition = new Vector3(UnityEngine.Random.Range(-10, 10), UnityEngine.Random.Range(-10, 10), 0);
-            Quaternion spawnRotation = Quaternion.identity;
-            Instantiate(enemy, spawnPosition, spawnRotation);
+            var direction = (Direction)UnityEngine.Random.Range(0, 3);
+            Vector3 spawnPosition = GetSpawnPositionFromDirection(direction);
+
+            Instantiate(enemy, spawnPosition, Quaternion.identity);
         }
     }
 

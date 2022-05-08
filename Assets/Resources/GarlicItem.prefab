@@ -144,7 +144,7 @@ MonoBehaviour:
   attackSpeed: 10
   maxDamageCooldown: 0
   damageCooldown: 0
-  strength: 5
+  strength: 20
   range: 3
 --- !u!58 &-6356492044433785601
 CircleCollider2D:
