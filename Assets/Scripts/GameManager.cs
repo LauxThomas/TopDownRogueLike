@@ -8,6 +8,7 @@ public class GameManager : MonoBehaviour
 {
     public List<GameObject> weapons = new List<GameObject>();
     public List<GameObject> enemies = new List<GameObject>();
+    public List<GameObject> drops = new List<GameObject>();
     private string pathToPrefabs = "Assets/Resources/";
     public Transform player = null;
     public int numberOfEnemies = 10;
@@ -21,6 +22,13 @@ public class GameManager : MonoBehaviour
 
 
         player.gameObject.GetComponent<PlayerAttack>().enabled = true;
+    }
+
+    internal void GivePlayerItem()
+    {
+        //TODO: Open selction dialog with weapons and give player weapon
+        Debug.Log("Given player an item");
+
     }
 
     private void SpawnEnemies(int numberOfEnemies)
@@ -63,14 +71,28 @@ public class GameManager : MonoBehaviour
                             AddEnemy(currentPrefab);
                             break;
                         }
+                    case "Drop":
+                        {
+                            AddDrop(currentPrefab);
+                            break;
+                        }
                 }
             }
         }
     }
 
-    internal void DropItem(GameObject gameObject)
+
+    internal void DropItem(Transform killedEnemy)
     {
-        Debug.Log("Drop item");
+        //get random drop   
+        int randomDrop = UnityEngine.Random.Range(0, drops.Count);
+        GameObject drop = drops[randomDrop];
+        Instantiate(drop, killedEnemy.position, killedEnemy.rotation);
+
+    }
+    private void AddDrop(GameObject currentPrefab)
+    {
+        drops.Add(currentPrefab);
     }
 
     private void AddEnemy(GameObject currentPrefab)
