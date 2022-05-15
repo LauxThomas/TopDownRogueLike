@@ -18,7 +18,7 @@ public class PlayerAttack : MonoBehaviour
         foreach (Transform child in transform)
             weapons.Add(child);
 
-        Transform garlic = weapons.Where(obj => obj.name == "GarlicItem(Clone)").SingleOrDefault();
+        Transform garlic = weapons.Where(obj => obj.name == "Garlic").SingleOrDefault();
         garlic.gameObject.SetActive(true);
     }
 }

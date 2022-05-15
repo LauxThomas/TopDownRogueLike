@@ -15,7 +15,7 @@ public class DroppedItem : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Player"))
         {
-            gameManager.GivePlayerItem();
+            gameManager.OpenLevelSceneAndFreezeTime();
 
             Destroy(gameObject);
         }

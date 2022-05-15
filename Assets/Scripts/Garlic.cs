@@ -12,6 +12,7 @@ public class Garlic : MonoBehaviour
     public float range = 1;
     private CircleCollider2D circleCollider2D;
     private SpriteRenderer spriteRenderer;
+    
 
     private void Start()
     {
@@ -19,7 +20,7 @@ public class Garlic : MonoBehaviour
 
         SetRadius();
 
-        
+
     }
 
     private void SetRadius()

@@ -8,6 +8,8 @@ TagManager:
   - GameManager
   - Weapon
   - Drop
+  - LevelUpScreen
+  - LevelUpOption
   layers:
   - Default
   - TransparentFX

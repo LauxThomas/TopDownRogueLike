@@ -66,7 +66,7 @@ public class EnemyController : MonoBehaviour
 
             int random = UnityEngine.Random.Range(0, 100);
             if (random < 30)
-                gameManager.DropItem(transform);
+              gameManager.DropItem(transform);
             Destroy(gameObject);
         }
     }

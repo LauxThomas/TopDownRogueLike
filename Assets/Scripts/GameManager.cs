@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -14,35 +15,56 @@ public class GameManager : MonoBehaviour
     private Transform player = null;
     private int numberOfEnemies = 50;
 
+    [SerializeField]private LevelUpScreen levelUpScreen;
+
 
     void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player").transform;
+
+
         InitPrefabs();
         SpawnEnemies(numberOfEnemies);
         //spawnAtEdge();
 
         player.gameObject.GetComponent<PlayerAttack>().enabled = true;
+        if (levelUpScreen == null) { levelUpScreen = GameObject.FindGameObjectWithTag("LevelUpScreen").GetComponent<LevelUpScreen>(); }
+        levelUpScreen.SetWeapons(weapons);
+        levelUpScreen.gameObject.SetActive(false);
     }
 
-    internal void GivePlayerItem()
+    internal void OpenLevelSceneAndFreezeTime()
     {
-        //TODO: Open selction dialog with weapons and give player weapon
-        Debug.Log("Given player an item");
-
+        StopTime(true);
+        SetLevelUpScreenActive(true);
     }
 
-    //private void spawnAtEdge()
-    //{
-    //    //get position at the edge of the camera
+    public void CloseLevelSceneAndUnFreezeTime(string SelectedItem)
+    {
+        UpdateLevelOfSelectedItem(SelectedItem);
+        StopTime(false);
+        SetLevelUpScreenActive(false);
+    }
 
-    //    var direction = (Direction)UnityEngine.Random.Range(0, 3);
-    //    Vector3 spawnPosition = GetSpawnPositionFromDirection(direction);
+    private void UpdateLevelOfSelectedItem(string selectedItem)
+    {
+        var weapon = GetWeaponBasedOfName(selectedItem);
+        if (weapon != null)
+        {
+            weapon.GetComponent<WeaponStats>().Level += 1;
+            Debug.Log("Waffenlevel von " + weapon.name + " ist nun " + weapon.GetComponent<WeaponStats>().Level);
+        }
+    }
 
-    //    int randomEnemy = UnityEngine.Random.Range(0, enemies.Count);
-    //    GameObject enemy = enemies[randomEnemy];
-    //    Instantiate(enemy, spawnPosition, Quaternion.identity);
-    //}
+    private GameObject GetWeaponBasedOfName(string selectedItem)
+    {
+        return(weapons.Where(obj => obj.name == selectedItem).SingleOrDefault());
+    }
+
+    private void SetLevelUpScreenActive(bool isActive) => levelUpScreen.gameObject.SetActive(isActive);
+
+    private void StopTime(bool isStopped) => Time.timeScale = isStopped ? 0 : 1;
+
 
     private Vector3 GetSpawnPositionFromDirection(Direction direction)
     {
@@ -50,19 +72,14 @@ public class GameManager : MonoBehaviour
         float randomValue = UnityEngine.Random.value;
 
 
-        switch (direction)
+        return direction switch
         {
-            case Direction.North:
-                return (Camera.main.ViewportToWorldPoint(new Vector3(randomValue, 1+0.1f, 0)));
-            case Direction.South:
-                return (Camera.main.ViewportToWorldPoint(new Vector3(randomValue, 0 - 0.1f, 0)));
-            case Direction.West:
-                return (Camera.main.ViewportToWorldPoint(new Vector3(0 - 0.1f, randomValue, 0)));
-            case Direction.East:
-                return (Camera.main.ViewportToWorldPoint(new Vector3(1 + 0.1f, randomValue, 0)));
-            default:
-                return (Camera.main.ViewportToWorldPoint(new Vector3(1, 1, 0)));
-        }
+            Direction.North => (Camera.main.ViewportToWorldPoint(new Vector3(randomValue, 1 + 0.1f, 0))),
+            Direction.South => (Camera.main.ViewportToWorldPoint(new Vector3(randomValue, 0 - 0.1f, 0))),
+            Direction.West => (Camera.main.ViewportToWorldPoint(new Vector3(0 - 0.1f, randomValue, 0))),
+            Direction.East => (Camera.main.ViewportToWorldPoint(new Vector3(1 + 0.1f, randomValue, 0))),
+            _ => (Camera.main.ViewportToWorldPoint(new Vector3(1, 1, 0))),
+        };
     }
 
     private void SpawnEnemies(int numberOfEnemies)
@@ -110,6 +127,9 @@ public class GameManager : MonoBehaviour
                             AddDrop(currentPrefab);
                             break;
                         }
+
+                    default:
+                        break;
                 }
             }
         }
@@ -137,6 +157,7 @@ public class GameManager : MonoBehaviour
     private void AddWeapon(GameObject currentPrefab)
     {
         var currentWeapon = Instantiate(currentPrefab, player);
+        currentWeapon.name = currentWeapon.name.Replace("(Clone)", "");
         weapons.Add(currentWeapon);
         currentWeapon.SetActive(false);
     }
